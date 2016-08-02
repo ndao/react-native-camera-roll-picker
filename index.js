@@ -117,7 +117,7 @@ class CameraRollPicker extends Component {
         source={require('./circle-check.png')}
       />;
 
-    var selectedIndex = typeof findSelectedIndex === 'func'
+    var selectedIndex = typeof findSelectedIndex === 'function'
       ? findSelectedIndex(this.state.selected, item)
       : this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0
 
@@ -167,7 +167,7 @@ class CameraRollPicker extends Component {
     var {maximum, imagesPerRow, callback} = this.props;
 
     var selected = this.state.selected,
-        index = typeof findSelectedIndex === 'func'
+        index = typeof findSelectedIndex === 'function'
                   ? findSelectedIndex(selected, image)
                   : this._arrayObjectIndexOf(selected, 'uri', image.uri);
 
