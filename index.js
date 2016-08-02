@@ -109,7 +109,7 @@ class CameraRollPicker extends Component {
   }
 
   _renderImage(item) {
-    var {selectedMarker, imageMargin, isImageSelected} = this.props;
+    var {selectedMarker, imageMargin, findSelectedIndex} = this.props;
 
     var marker = selectedMarker ? selectedMarker :
       <Image
@@ -117,7 +117,7 @@ class CameraRollPicker extends Component {
         source={require('./circle-check.png')}
       />;
 
-    var selectedIndex = typeof isImageSelected === 'func'
+    var selectedIndex = typeof findSelectedIndex === 'func'
       ? findSelectedIndex(this.state.selected, item)
       : this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0
 
@@ -167,8 +167,8 @@ class CameraRollPicker extends Component {
     var {maximum, imagesPerRow, callback} = this.props;
 
     var selected = this.state.selected,
-        index = typeof isImageSelected === 'func'
-                  ? isImageSelected(selected, image)
+        index = typeof findSelectedIndex === 'func'
+                  ? findSelectedIndex(selected, image)
                   : this._arrayObjectIndexOf(selected, 'uri', image.uri);
 
     if (index >= 0) {
