@@ -118,7 +118,7 @@ class CameraRollPicker extends Component {
       />;
 
     var selectedIndex = typeof findSelectedIndex === 'function'
-      ? findSelectedIndex(this.state.selected, item)
+      ? findSelectedIndex(this.state.selected, item.node.image)
       : this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0
 
     return (
