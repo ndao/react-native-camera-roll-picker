@@ -109,13 +109,17 @@ class CameraRollPicker extends Component {
   }
 
   _renderImage(item) {
-    var {selectedMarker, imageMargin} = this.props;
+    var {selectedMarker, imageMargin, isImageSelected} = this.props;
 
     var marker = selectedMarker ? selectedMarker :
       <Image
         style={[styles.marker, {width: 25, height: 25, right: imageMargin + 5},]}
         source={require('./circle-check.png')}
       />;
+
+    var selectedIndex = typeof isImageSelected === 'func'
+      ? findSelectedIndex(this.state.selected, item)
+      : this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0
 
     return (
       <TouchableOpacity
@@ -125,7 +129,7 @@ class CameraRollPicker extends Component {
         <Image
           source={{uri: item.node.image.uri}}
           style={{height: this._imageSize, width: this._imageSize}} >
-          { (this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0) ? marker : null }
+          { selectedIndex > -1 ? marker : null }
         </Image>
       </TouchableOpacity>
     );
@@ -163,7 +167,9 @@ class CameraRollPicker extends Component {
     var {maximum, imagesPerRow, callback} = this.props;
 
     var selected = this.state.selected,
-        index = this._arrayObjectIndexOf(selected, 'uri', image.uri);
+        index = typeof isImageSelected === 'func'
+                  ? isImageSelected(selected, image)
+                  : this._arrayObjectIndexOf(selected, 'uri', image.uri);
 
     if (index >= 0) {
       selected.splice(index, 1);
@@ -249,6 +255,7 @@ CameraRollPicker.propTypes = {
   selected: React.PropTypes.array,
   selectedMarker: React.PropTypes.element,
   backgroundColor: React.PropTypes.string,
+  findSelectedIndex: React.PropTypes.func,
 }
 
 CameraRollPicker.defaultProps = {
