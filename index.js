@@ -109,8 +109,16 @@ class CameraRollPicker extends Component {
   }
 
   _renderImage(item) {
-    var {selectedMarker, imageMargin} = this.props;
-
+    var {selectedMarker, imageMargin, selectedVideoMarker} = this.props;
+    var imageUri = item.node.image.uri
+    var isVideo = !!imageUri.match(/&ext=MOV/)
+    var videoMarkerBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIS2NkoDFgpLH5DMPLggQGBgZ5EoLsFwMDw2MGBoYlOPRIMTAwPAMFEbO+vv5+Nzc3XS4uLgFiLWBjY2N49+7dh40bN665c+dOKpo+fw4OjtU/fvxoA1kQ6+XlNWPr1q1cxBqOrM7IyOjr+fPnAxkYGHaDxHl5ebvNzc1Tra2t+RobG5tAFtTX1dXVNzY2khXhGRkZ/2fOnJnFwMAwQ1xc/FRmZqZufX09R0NDw39qWpAvICBQu2LFClF3d3ewB6ltwcrk5OTwOXPmwEOB6hZkZWWFT506ddQCzIQMTUUraR5EaWlp4TNnzqRZHBTy8vLWb9y4UdDR0ZEmyRSc0URERM4VFBRoVldXo2S0WG9v7xlbtmwhq6gwNjb+eu7cOXhRISkpOV1XVzfS0tISXlSACrsDbm5uOtzc3CQXdhs2bMBW2AVycHCs+PHjRzty+QMqrhVIKPBAxfUjPMW1NAMDw1OyCjgSHDHMqkxSfE60WgBWiOsZnfkevAAAAABJRU5ErkJggg=='
+    var videoMarker = selectedVideoMarker
+                        ? selectedVideoMarker
+                        : <Image
+                            style={[styles.videoMarker, {width: 25, height: 25, right: imageMargin + 5},]}
+                            source={{uri: videoMarkerBase64, scale: 3}}
+                          />;
     var marker = selectedMarker ? selectedMarker :
       <Image
         style={[styles.marker, {width: 25, height: 25, right: imageMargin + 5},]}
@@ -121,10 +129,11 @@ class CameraRollPicker extends Component {
       <TouchableOpacity
         key={item.node.image.uri}
         style={{marginBottom: imageMargin, marginRight: imageMargin}}
-        onPress={event => this._selectImage(item.node.image)}>
+        onPress={event => this._selectImage(item.node)}>
         <Image
           source={{uri: item.node.image.uri}}
           style={{height: this._imageSize, width: this._imageSize}} >
+          { isVideo ? videoMarker : null }
           { (this._arrayObjectIndexOf(this.state.selected, 'uri', item.node.image.uri) >= 0) ? marker : null }
         </Image>
       </TouchableOpacity>
@@ -159,17 +168,17 @@ class CameraRollPicker extends Component {
     }
   }
 
-  _selectImage(image) {
+  _selectImage(node) {
     var {maximum, imagesPerRow, callback} = this.props;
 
     var selected = this.state.selected,
-        index = this._arrayObjectIndexOf(selected, 'uri', image.uri);
+        index = this._arrayObjectIndexOf(selected, 'uri', node.image.uri);
 
     if (index >= 0) {
       selected.splice(index, 1);
     } else {
       if (selected.length < maximum) {
-        selected.push(image);
+        selected.push(node);
       }
     }
 
@@ -180,7 +189,7 @@ class CameraRollPicker extends Component {
       ),
     });
 
-    callback(this.state.selected, image);
+    callback(this.state.selected, node);
   }
 
   _nEveryRow(data, n) {
@@ -206,9 +215,8 @@ class CameraRollPicker extends Component {
   }
 
   _arrayObjectIndexOf(array, property, value) {
-    return array.map((o) => { return o[property]; }).indexOf(value);
+    return array.map((o) => { return o.image[property]; }).indexOf(value);
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -222,6 +230,11 @@ const styles = StyleSheet.create({
   marker: {
     position: 'absolute',
     top: 5,
+    backgroundColor: 'transparent',
+  },
+  videoMarker: {
+    position: 'absolute',
+    bottom: 5,
     backgroundColor: 'transparent',
   },
 })
